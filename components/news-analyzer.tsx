@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
-import { Shield, AlertTriangle, CheckCircle, BarChart3, FileText, Zap, Upload, X } from "lucide-react"
+import { Shield, AlertTriangle, CheckCircle, BarChart3, FileText, Zap, Upload, X, Plus, ImageIcon } from "lucide-react"
 
 interface AnalysisResult {
   prediction: "FAKE" | "REAL"
@@ -219,35 +219,6 @@ export function NewsAnalyzer() {
             </div>
           </div>
 
-          {/* File Upload Zone */}
-          <div
-            onDrop={handleDrop}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            className={`relative mb-4 border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
-              isDragging 
-                ? "border-primary bg-primary/5" 
-                : "border-border hover:border-muted-foreground"
-            }`}
-          >
-            <input
-              type="file"
-              accept=".txt,.md"
-              onChange={(e) => {
-                const file = e.target.files?.[0]
-                if (file) handleFileUpload(file)
-              }}
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-            />
-            <Upload className={`w-8 h-8 mx-auto mb-2 ${isDragging ? "text-primary" : "text-muted-foreground"}`} />
-            <p className="text-sm text-muted-foreground">
-              <span className="font-medium text-foreground">Click to upload</span> or drag and drop
-            </p>
-            <p className="text-xs text-muted-foreground mt-1">
-              Supports .txt and .md files
-            </p>
-          </div>
-
           {/* File Name Badge */}
           {fileName && (
             <div className="flex items-center gap-2 mb-4 p-2 bg-secondary/50 rounded-lg w-fit">
@@ -262,16 +233,69 @@ export function NewsAnalyzer() {
             </div>
           )}
 
-          <textarea
-            value={text}
-            onChange={(e) => {
-              setText(e.target.value)
-              setFileName(null)
-              setResult(null)
-            }}
-            placeholder="Paste or type the news article text here, or upload a file above..."
-            className="w-full h-48 bg-input border border-border rounded-lg p-4 text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:ring-2 focus:ring-ring"
-          />
+          {/* Text Input with Plus Button */}
+          <div 
+            className={`relative bg-input border rounded-lg transition-colors ${
+              isDragging ? "border-primary bg-primary/5" : "border-border"
+            }`}
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+          >
+            <textarea
+              value={text}
+              onChange={(e) => {
+                setText(e.target.value)
+                setFileName(null)
+                setResult(null)
+              }}
+              placeholder="Paste or type the news article text here..."
+              className="w-full h-48 bg-transparent p-4 pb-14 text-foreground placeholder:text-muted-foreground resize-none focus:outline-none"
+            />
+            
+            {/* Bottom toolbar with Plus button */}
+            <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                {/* Plus button for file upload */}
+                <label className="relative cursor-pointer group">
+                  <input
+                    type="file"
+                    accept=".txt,.md,image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0]
+                      if (file) handleFileUpload(file)
+                    }}
+                    className="hidden"
+                  />
+                  <div className="w-9 h-9 rounded-full bg-secondary hover:bg-muted flex items-center justify-center transition-colors border border-border">
+                    <Plus className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
+                  </div>
+                </label>
+                
+                {/* Optional: Additional upload buttons */}
+                <label className="relative cursor-pointer group">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0]
+                      if (file) {
+                        alert("Image OCR coming soon! For now, please upload .txt or .md files.")
+                      }
+                    }}
+                    className="hidden"
+                  />
+                  <div className="w-9 h-9 rounded-full bg-secondary hover:bg-muted flex items-center justify-center transition-colors border border-border">
+                    <ImageIcon className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+                  </div>
+                </label>
+              </div>
+              
+              <span className="text-xs text-muted-foreground">
+                Drop files here or click +
+              </span>
+            </div>
+          </div>
           
           <div className="flex items-center justify-between mt-4">
             <span className="text-sm text-muted-foreground">
