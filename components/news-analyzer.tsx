@@ -1,9 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
-import { Shield, AlertTriangle, CheckCircle, BarChart3, FileText, Zap, Upload, X, Plus, ImageIcon } from "lucide-react"
+import { Shield, AlertTriangle, CheckCircle, BarChart3, FileText, Zap, Upload, X, Plus, ImageIcon, Camera } from "lucide-react"
 
 interface AnalysisResult {
   prediction: "FAKE" | "REAL"
@@ -127,6 +127,22 @@ export function NewsAnalyzer() {
   const [result, setResult] = useState<AnalysisResult | null>(null)
   const [fileName, setFileName] = useState<string | null>(null)
   const [isDragging, setIsDragging] = useState(false)
+  const [showAttachMenu, setShowAttachMenu] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const photoInputRef = useRef<HTMLInputElement>(null)
+  const documentInputRef = useRef<HTMLInputElement>(null)
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowAttachMenu(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
 
   const handleFileUpload = (file: File) => {
     const allowedTypes = [
@@ -255,40 +271,111 @@ export function NewsAnalyzer() {
             
             {/* Bottom toolbar with Plus button */}
             <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                {/* Plus button for file upload */}
-                <label className="relative cursor-pointer group">
-                  <input
-                    type="file"
-                    accept=".txt,.md,image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0]
-                      if (file) handleFileUpload(file)
-                    }}
-                    className="hidden"
-                  />
-                  <div className="w-9 h-9 rounded-full bg-secondary hover:bg-muted flex items-center justify-center transition-colors border border-border">
-                    <Plus className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
+              <div className="relative" ref={menuRef}>
+                {/* Hidden file inputs */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".txt,.md,.doc,.docx,.pdf"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0]
+                    if (file) handleFileUpload(file)
+                    setShowAttachMenu(false)
+                  }}
+                  className="hidden"
+                />
+                <input
+                  ref={photoInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0]
+                    if (file) {
+                      alert("Image OCR coming soon! For now, please upload text files.")
+                    }
+                    setShowAttachMenu(false)
+                  }}
+                  className="hidden"
+                />
+                <input
+                  ref={documentInputRef}
+                  type="file"
+                  accept=".txt,.md"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0]
+                    if (file) handleFileUpload(file)
+                    setShowAttachMenu(false)
+                  }}
+                  className="hidden"
+                />
+
+                {/* Plus button */}
+                <button
+                  onClick={() => setShowAttachMenu(!showAttachMenu)}
+                  className="w-9 h-9 rounded-full bg-secondary hover:bg-muted flex items-center justify-center transition-colors border border-border group"
+                >
+                  <Plus className={`w-5 h-5 text-muted-foreground group-hover:text-foreground transition-all duration-200 ${showAttachMenu ? "rotate-45" : ""}`} />
+                </button>
+
+                {/* Attachment Menu Popup */}
+                {showAttachMenu && (
+                  <div className="absolute bottom-12 left-0 bg-card border border-border rounded-xl shadow-lg py-2 min-w-[200px] animate-in fade-in slide-in-from-bottom-2 duration-200">
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-secondary/50 transition-colors text-left"
+                    >
+                      <div className="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                        <Upload className="w-5 h-5 text-blue-500" />
+                      </div>
+                      <div>
+                        <div className="text-sm font-medium text-foreground">Upload from computer</div>
+                        <div className="text-xs text-muted-foreground">Select files from your device</div>
+                      </div>
+                    </button>
+                    
+                    <button
+                      onClick={() => photoInputRef.current?.click()}
+                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-secondary/50 transition-colors text-left"
+                    >
+                      <div className="w-9 h-9 rounded-lg bg-green-500/10 flex items-center justify-center">
+                        <ImageIcon className="w-5 h-5 text-green-500" />
+                      </div>
+                      <div>
+                        <div className="text-sm font-medium text-foreground">Photos</div>
+                        <div className="text-xs text-muted-foreground">Upload images for OCR analysis</div>
+                      </div>
+                    </button>
+
+                    <button
+                      onClick={() => documentInputRef.current?.click()}
+                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-secondary/50 transition-colors text-left"
+                    >
+                      <div className="w-9 h-9 rounded-lg bg-orange-500/10 flex items-center justify-center">
+                        <FileText className="w-5 h-5 text-orange-500" />
+                      </div>
+                      <div>
+                        <div className="text-sm font-medium text-foreground">Documents</div>
+                        <div className="text-xs text-muted-foreground">Upload .txt or .md files</div>
+                      </div>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        alert("Camera capture coming soon!")
+                        setShowAttachMenu(false)
+                      }}
+                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-secondary/50 transition-colors text-left"
+                    >
+                      <div className="w-9 h-9 rounded-lg bg-purple-500/10 flex items-center justify-center">
+                        <Camera className="w-5 h-5 text-purple-500" />
+                      </div>
+                      <div>
+                        <div className="text-sm font-medium text-foreground">Take photo</div>
+                        <div className="text-xs text-muted-foreground">Use camera to capture text</div>
+                      </div>
+                    </button>
                   </div>
-                </label>
-                
-                {/* Optional: Additional upload buttons */}
-                <label className="relative cursor-pointer group">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0]
-                      if (file) {
-                        alert("Image OCR coming soon! For now, please upload .txt or .md files.")
-                      }
-                    }}
-                    className="hidden"
-                  />
-                  <div className="w-9 h-9 rounded-full bg-secondary hover:bg-muted flex items-center justify-center transition-colors border border-border">
-                    <ImageIcon className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
-                  </div>
-                </label>
+                )}
               </div>
               
               <span className="text-xs text-muted-foreground">
