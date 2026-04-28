@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
-import { Shield, AlertTriangle, CheckCircle, BarChart3, FileText, Zap } from "lucide-react"
+import { Shield, AlertTriangle, CheckCircle, BarChart3, FileText, Zap, Upload, X } from "lucide-react"
 
 interface AnalysisResult {
   prediction: "FAKE" | "REAL"
@@ -125,6 +125,54 @@ export function NewsAnalyzer() {
   const [text, setText] = useState("")
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [result, setResult] = useState<AnalysisResult | null>(null)
+  const [fileName, setFileName] = useState<string | null>(null)
+  const [isDragging, setIsDragging] = useState(false)
+
+  const handleFileUpload = (file: File) => {
+    const allowedTypes = [
+      "text/plain",
+      "text/markdown",
+      "application/pdf",
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    ]
+    
+    // For simplicity, we'll only read text files properly
+    if (file.type === "text/plain" || file.name.endsWith(".txt") || file.name.endsWith(".md")) {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const content = e.target?.result as string
+        setText(content)
+        setFileName(file.name)
+        setResult(null)
+      }
+      reader.readAsText(file)
+    } else {
+      alert("Please upload a .txt or .md file. Other formats are not supported yet.")
+    }
+  }
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(false)
+    const file = e.dataTransfer.files[0]
+    if (file) handleFileUpload(file)
+  }
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(true)
+  }
+
+  const handleDragLeave = () => {
+    setIsDragging(false)
+  }
+
+  const clearFile = () => {
+    setFileName(null)
+    setText("")
+    setResult(null)
+  }
 
   const handleAnalyze = async () => {
     if (!text.trim()) return
@@ -170,14 +218,58 @@ export function NewsAnalyzer() {
               </button>
             </div>
           </div>
-          
+
+          {/* File Upload Zone */}
+          <div
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            className={`relative mb-4 border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+              isDragging 
+                ? "border-primary bg-primary/5" 
+                : "border-border hover:border-muted-foreground"
+            }`}
+          >
+            <input
+              type="file"
+              accept=".txt,.md"
+              onChange={(e) => {
+                const file = e.target.files?.[0]
+                if (file) handleFileUpload(file)
+              }}
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+            />
+            <Upload className={`w-8 h-8 mx-auto mb-2 ${isDragging ? "text-primary" : "text-muted-foreground"}`} />
+            <p className="text-sm text-muted-foreground">
+              <span className="font-medium text-foreground">Click to upload</span> or drag and drop
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Supports .txt and .md files
+            </p>
+          </div>
+
+          {/* File Name Badge */}
+          {fileName && (
+            <div className="flex items-center gap-2 mb-4 p-2 bg-secondary/50 rounded-lg w-fit">
+              <FileText className="w-4 h-4 text-primary" />
+              <span className="text-sm text-foreground">{fileName}</span>
+              <button
+                onClick={clearFile}
+                className="p-0.5 rounded hover:bg-muted transition-colors"
+              >
+                <X className="w-4 h-4 text-muted-foreground hover:text-foreground" />
+              </button>
+            </div>
+          )}
+
           <textarea
             value={text}
             onChange={(e) => {
               setText(e.target.value)
+              setFileName(null)
               setResult(null)
             }}
-            placeholder="Paste or type the news article text here..."
+            placeholder="Paste or type the news article text here, or upload a file above..."
             className="w-full h-48 bg-input border border-border rounded-lg p-4 text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:ring-2 focus:ring-ring"
           />
           
