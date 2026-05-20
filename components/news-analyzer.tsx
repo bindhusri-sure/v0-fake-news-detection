@@ -208,27 +208,31 @@ export function NewsAnalyzer() {
     setText(type === "fake" ? SAMPLE_FAKE : SAMPLE_REAL)
     setResult(null)
   }
-
   return (
-    <div className="w-full max-w-4xl mx-auto">
-      <div className="flex flex-col gap-6">
+    <div className="w-full max-w-4xl mx-auto relative z-10">
+      <div className="flex flex-col gap-8">
         {/* Input Section */}
-        <div className="bg-card rounded-xl border border-border p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-              <FileText className="w-5 h-5 text-primary" />
+        <div className="glass-card glow-border rounded-2xl p-6 md:p-8 shadow-xl relative overflow-hidden">
+          {/* Subtle glow effect behind input */}
+          <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/10 rounded-full blur-2xl pointer-events-none" />
+          
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+            <h2 className="text-lg font-bold text-foreground flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-primary/15 flex items-center justify-center border border-primary/20">
+                <FileText className="w-4.5 h-4.5 text-primary" />
+              </div>
               Enter News Article
             </h2>
-            <div className="flex gap-2">
+            <div className="flex gap-2.5">
               <button
                 onClick={() => loadSample("fake")}
-                className="text-xs px-3 py-1.5 rounded-md bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors"
+                className="text-xs font-semibold px-3.5 py-2 rounded-lg bg-destructive/10 text-destructive hover:bg-destructive/20 border border-destructive/20 transition-all duration-200"
               >
                 Load Fake Sample
               </button>
               <button
                 onClick={() => loadSample("real")}
-                className="text-xs px-3 py-1.5 rounded-md bg-success/10 text-success hover:bg-success/20 transition-colors"
+                className="text-xs font-semibold px-3.5 py-2 rounded-lg bg-success/15 text-success hover:bg-success/25 border border-success/25 transition-all duration-200"
               >
                 Load Real Sample
               </button>
@@ -237,9 +241,9 @@ export function NewsAnalyzer() {
 
           {/* File Name Badge */}
           {fileName && (
-            <div className="flex items-center gap-2 mb-4 p-2 bg-secondary/50 rounded-lg w-fit">
-              <FileText className="w-4 h-4 text-primary" />
-              <span className="text-sm text-foreground">{fileName}</span>
+            <div className="flex items-center gap-2 mb-4 p-2 bg-secondary/50 rounded-lg w-fit border border-border/40">
+              <FileText className="w-4 h-4 text-accent" />
+              <span className="text-sm font-medium text-foreground">{fileName}</span>
               <button
                 onClick={clearFile}
                 className="p-0.5 rounded hover:bg-muted transition-colors"
@@ -251,8 +255,8 @@ export function NewsAnalyzer() {
 
           {/* Text Input with Plus Button */}
           <div 
-            className={`relative bg-input border rounded-lg transition-colors ${
-              isDragging ? "border-primary bg-primary/5" : "border-border"
+            className={`relative bg-input/40 backdrop-blur-sm border rounded-xl transition-all duration-300 ${
+              isDragging ? "border-accent bg-accent/5 ring-2 ring-accent/15" : "border-border/60 hover:border-border"
             }`}
             onDrop={handleDrop}
             onDragOver={handleDragOver}
@@ -266,11 +270,11 @@ export function NewsAnalyzer() {
                 setResult(null)
               }}
               placeholder="Paste or type the news article text here..."
-              className="w-full h-48 bg-transparent p-4 pb-14 text-foreground placeholder:text-muted-foreground resize-none focus:outline-none"
+              className="w-full h-52 bg-transparent p-5 pb-16 text-foreground placeholder:text-muted-foreground/60 resize-none focus:outline-none leading-relaxed text-sm md:text-base"
             />
             
             {/* Bottom toolbar with Plus button */}
-            <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
+            <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
               <div className="relative" ref={menuRef}>
                 {/* Hidden file inputs */}
                 <input
@@ -312,50 +316,50 @@ export function NewsAnalyzer() {
                 {/* Plus button */}
                 <button
                   onClick={() => setShowAttachMenu(!showAttachMenu)}
-                  className="w-9 h-9 rounded-full bg-secondary hover:bg-muted flex items-center justify-center transition-colors border border-border group"
+                  className="w-9 h-9 rounded-full bg-secondary hover:bg-muted flex items-center justify-center transition-all duration-200 border border-border/50 group"
                 >
-                  <Plus className={`w-5 h-5 text-muted-foreground group-hover:text-foreground transition-all duration-200 ${showAttachMenu ? "rotate-45" : ""}`} />
+                  <Plus className={`w-5 h-5 text-muted-foreground group-hover:text-foreground transition-all duration-300 ${showAttachMenu ? "rotate-45" : ""}`} />
                 </button>
 
                 {/* Attachment Menu Popup */}
                 {showAttachMenu && (
-                  <div className="absolute bottom-12 left-0 bg-card border border-border rounded-xl shadow-lg py-2 min-w-[200px] animate-in fade-in slide-in-from-bottom-2 duration-200">
+                  <div className="absolute bottom-12 left-0 glass-card border border-border/50 rounded-2xl shadow-2xl py-3 min-w-[220px] animate-in fade-in slide-in-from-bottom-3 duration-250 z-50">
                     <button
                       onClick={() => fileInputRef.current?.click()}
-                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-secondary/50 transition-colors text-left"
+                      className="w-full flex items-center gap-3.5 px-4 py-2.5 hover:bg-secondary/60 transition-colors text-left"
                     >
-                      <div className="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                        <Upload className="w-5 h-5 text-blue-500" />
+                      <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center border border-blue-100/80">
+                        <Upload className="w-5 h-5 text-blue-600" />
                       </div>
                       <div>
-                        <div className="text-sm font-medium text-foreground">Upload from computer</div>
-                        <div className="text-xs text-muted-foreground">Select files from your device</div>
+                        <div className="text-sm font-semibold text-foreground">Upload file</div>
+                        <div className="text-xxs text-muted-foreground">Select local files</div>
                       </div>
                     </button>
                     
                     <button
                       onClick={() => photoInputRef.current?.click()}
-                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-secondary/50 transition-colors text-left"
+                      className="w-full flex items-center gap-3.5 px-4 py-2.5 hover:bg-secondary/60 transition-colors text-left"
                     >
-                      <div className="w-9 h-9 rounded-lg bg-green-500/10 flex items-center justify-center">
-                        <ImageIcon className="w-5 h-5 text-green-500" />
+                      <div className="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center border border-emerald-100/80">
+                        <ImageIcon className="w-5 h-5 text-emerald-600" />
                       </div>
                       <div>
-                        <div className="text-sm font-medium text-foreground">Photos</div>
-                        <div className="text-xs text-muted-foreground">Upload images for OCR analysis</div>
+                        <div className="text-sm font-semibold text-foreground">Photos</div>
+                        <div className="text-xxs text-muted-foreground">Extract text from image</div>
                       </div>
                     </button>
 
                     <button
                       onClick={() => documentInputRef.current?.click()}
-                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-secondary/50 transition-colors text-left"
+                      className="w-full flex items-center gap-3.5 px-4 py-2.5 hover:bg-secondary/60 transition-colors text-left"
                     >
-                      <div className="w-9 h-9 rounded-lg bg-orange-500/10 flex items-center justify-center">
-                        <FileText className="w-5 h-5 text-orange-500" />
+                      <div className="w-9 h-9 rounded-xl bg-orange-50 flex items-center justify-center border border-orange-100/80">
+                        <FileText className="w-5 h-5 text-orange-600" />
                       </div>
                       <div>
-                        <div className="text-sm font-medium text-foreground">Documents</div>
-                        <div className="text-xs text-muted-foreground">Upload .txt or .md files</div>
+                        <div className="text-sm font-semibold text-foreground">Documents</div>
+                        <div className="text-xxs text-muted-foreground">Upload .txt or .md</div>
                       </div>
                     </button>
 
@@ -364,34 +368,34 @@ export function NewsAnalyzer() {
                         alert("Camera capture coming soon!")
                         setShowAttachMenu(false)
                       }}
-                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-secondary/50 transition-colors text-left"
+                      className="w-full flex items-center gap-3.5 px-4 py-2.5 hover:bg-secondary/60 transition-colors text-left"
                     >
-                      <div className="w-9 h-9 rounded-lg bg-purple-500/10 flex items-center justify-center">
-                        <Camera className="w-5 h-5 text-purple-500" />
+                      <div className="w-9 h-9 rounded-xl bg-purple-50 flex items-center justify-center border border-purple-100/80">
+                        <Camera className="w-5 h-5 text-purple-600" />
                       </div>
                       <div>
-                        <div className="text-sm font-medium text-foreground">Take photo</div>
-                        <div className="text-xs text-muted-foreground">Use camera to capture text</div>
+                        <div className="text-sm font-semibold text-foreground">Take photo</div>
+                        <div className="text-xxs text-muted-foreground">Use system camera</div>
                       </div>
                     </button>
                   </div>
                 )}
               </div>
               
-              <span className="text-xs text-muted-foreground">
+              <span className="text-xs text-muted-foreground font-medium">
                 Drop files here or click +
               </span>
             </div>
           </div>
           
-          <div className="flex items-center justify-between mt-4">
-            <span className="text-sm text-muted-foreground">
+          <div className="flex items-center justify-between mt-5">
+            <span className="text-sm text-muted-foreground font-medium">
               {text.split(/\s+/).filter(w => w.length > 0).length} words
             </span>
             <Button
               onClick={handleAnalyze}
               disabled={!text.trim() || isAnalyzing}
-              className="bg-primary text-primary-foreground hover:bg-primary/90 px-6"
+              className="bg-gradient-to-r from-primary to-accent hover:opacity-95 text-primary-foreground font-bold shadow-lg shadow-primary/20 rounded-xl px-7 py-2.5 transition-all duration-300 transform hover:scale-[1.02]"
             >
               {isAnalyzing ? (
                 <>
@@ -401,7 +405,7 @@ export function NewsAnalyzer() {
               ) : (
                 <>
                   <Zap className="w-4 h-4 mr-2" />
-                  Analyze
+                  Analyze Article
                 </>
               )}
             </Button>
@@ -410,70 +414,75 @@ export function NewsAnalyzer() {
 
         {/* Results Section */}
         {result && (
-          <div className="bg-card rounded-xl border border-border p-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            {/* Main Result */}
-            <div className={`flex items-center justify-between p-6 rounded-lg mb-6 ${
+          <div className="glass-card rounded-2xl p-6 md:p-8 border border-border/50 shadow-2xl animate-in fade-in slide-in-from-bottom-5 duration-500 relative overflow-hidden">
+            {/* Subtle mesh overlay */}
+            <div className="absolute top-0 right-0 w-48 h-48 bg-accent/5 rounded-full blur-3xl pointer-events-none" />
+            
+            {/* Main Result Header */}
+            <div className={`flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 rounded-2xl mb-8 gap-4 border ${
               result.prediction === "FAKE" 
-                ? "bg-destructive/10 border border-destructive/30" 
-                : "bg-success/10 border border-success/30"
+                ? "bg-gradient-to-br from-destructive/15 to-destructive/5 border-destructive/25" 
+                : "bg-gradient-to-br from-success/15 to-success/5 border-success/25"
             }`}>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4.5">
                 {result.prediction === "FAKE" ? (
-                  <div className="w-14 h-14 rounded-full bg-destructive/20 flex items-center justify-center">
+                  <div className="w-14 h-14 rounded-2xl bg-destructive/20 flex items-center justify-center shadow-lg shadow-destructive/10 border border-destructive/30">
                     <AlertTriangle className="w-7 h-7 text-destructive" />
                   </div>
                 ) : (
-                  <div className="w-14 h-14 rounded-full bg-success/20 flex items-center justify-center">
+                  <div className="w-14 h-14 rounded-2xl bg-success/20 flex items-center justify-center shadow-lg shadow-success/10 border border-success/30">
                     <CheckCircle className="w-7 h-7 text-success" />
                   </div>
                 )}
                 <div>
-                  <h3 className={`text-2xl font-bold ${
+                  <h3 className={`text-2xl font-black tracking-tight ${
                     result.prediction === "FAKE" ? "text-destructive" : "text-success"
                   }`}>
                     {result.prediction === "FAKE" ? "Likely Fake News" : "Likely Real News"}
                   </h3>
-                  <p className="text-muted-foreground">
-                    Analysis completed with {result.confidence}% confidence
+                  <p className="text-sm text-muted-foreground/80 font-medium mt-0.5">
+                    Analyzed with {result.confidence}% confidence check
                   </p>
                 </div>
               </div>
-              <div className="text-right">
-                <div className={`text-4xl font-bold ${
+              <div className="text-left sm:text-right">
+                <div className={`text-4xl font-extrabold tracking-tight ${
                   result.prediction === "FAKE" ? "text-destructive" : "text-success"
                 }`}>
                   {result.confidence}%
                 </div>
-                <div className="text-sm text-muted-foreground">Confidence</div>
+                <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mt-1">Confidence Score</div>
               </div>
             </div>
 
             {/* Indicators Grid */}
-            <div className="mb-6">
-              <h4 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
-                <BarChart3 className="w-4 h-4 text-primary" />
-                Analysis Breakdown
+            <div className="mb-8">
+              <h4 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2 tracking-wide uppercase">
+                <BarChart3 className="w-4 h-4 text-accent" />
+                Analysis Indicators
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {result.indicators.map((indicator) => (
-                  <div key={indicator.name} className="bg-secondary/50 rounded-lg p-4">
+                  <div key={indicator.name} className="bg-secondary/35 backdrop-blur-md rounded-xl p-5 border border-border/30 hover:border-border/50 transition-all duration-200">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-foreground">{indicator.name}</span>
+                      <span className="text-sm font-semibold text-foreground/90">{indicator.name}</span>
                       <span className={`text-sm font-bold ${
                         indicator.score > 50 ? "text-destructive" : "text-success"
                       }`}>
                         {indicator.score}%
                       </span>
                     </div>
-                    <div className="w-full h-2 bg-muted rounded-full overflow-hidden mb-2">
+                    <div className="w-full h-2.5 bg-muted/50 rounded-full overflow-hidden mb-3">
                       <div 
                         className={`h-full rounded-full transition-all duration-500 ${
-                          indicator.score > 50 ? "bg-destructive" : "bg-success"
+                          indicator.score > 50 
+                            ? "bg-gradient-to-r from-destructive/80 to-destructive" 
+                            : "bg-gradient-to-r from-success/80 to-success"
                         }`}
                         style={{ width: `${indicator.score}%` }}
                       />
                     </div>
-                    <p className="text-xs text-muted-foreground">{indicator.description}</p>
+                    <p className="text-xs text-muted-foreground/85 leading-relaxed">{indicator.description}</p>
                   </div>
                 ))}
               </div>
@@ -481,13 +490,13 @@ export function NewsAnalyzer() {
 
             {/* Stats */}
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-secondary/50 rounded-lg p-4 text-center">
-                <div className="text-2xl font-bold text-foreground">{result.wordCount}</div>
-                <div className="text-sm text-muted-foreground">Words Analyzed</div>
+              <div className="bg-secondary/35 border border-border/30 rounded-xl p-5 text-center">
+                <div className="text-2xl font-extrabold text-foreground">{result.wordCount}</div>
+                <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider mt-1">Words Analyzed</div>
               </div>
-              <div className="bg-secondary/50 rounded-lg p-4 text-center">
-                <div className="text-2xl font-bold text-foreground">{result.indicators.length}</div>
-                <div className="text-sm text-muted-foreground">Indicators Checked</div>
+              <div className="bg-secondary/35 border border-border/30 rounded-xl p-5 text-center">
+                <div className="text-2xl font-extrabold text-foreground">{result.sentimentScore}%</div>
+                <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider mt-1">Subjectivity Index</div>
               </div>
             </div>
           </div>
